@@ -4,15 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.cluster import KMeans
-from sklearn.cluster import AgglomerativeClustering
 
 import squarify
 import datetime as datetime
 
-df_raw_1 = pd.read_csv('OnlineRetail_1.csv', encoding='ISO-8859-1').dropna()
-df_raw_2 = pd.read_csv('OnlineRetail_2.csv', encoding='ISO-8859-1').dropna()
-
-df = pd.concat([df_raw_1, df_raw_2])
+df = pd.concat([pd.read_csv('OnlineRetail_1.csv', encoding='ISO-8859-1').dropna(), pd.read_csv('OnlineRetail_2.csv', encoding='ISO-8859-1').dropna()])
 
 ##EDA
 df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
@@ -20,13 +16,12 @@ df.dropna(inplace = True)
 df['CustomerID'] = df['CustomerID'].astype('object')
 df_1 = df[df['Quantity'] >0]
 df_1['Revenue'] = df_1.Quantity*df_1.UnitPrice
-df_2 = df_1.copy()
-max_date = df_2['InvoiceDate'].max().date()
+max_date = df_1['InvoiceDate'].max().date()
 recency = lambda x: (max_date - x.max().date()).days
 frequency = lambda x: len(x.unique())
 monetary = lambda x: round(sum(x), 2)
 
-RFM = df_2.groupby('CustomerID').agg({'InvoiceDate': recency,
+RFM = df_1.groupby('CustomerID').agg({'InvoiceDate': recency,
                                     'InvoiceNo': frequency,
                                     'Revenue': monetary})
 RFM.columns = ['Recency', 'Frequency', 'Monetary']
@@ -44,7 +39,7 @@ def join_rfm(x) : return str(int(x['R'])) + str(int(x['F'])) + str(int(x['M']))
 RFM['RFM_Segment'] = RFM.apply(join_rfm, axis = 1)
 RFM['RFM_Score'] = RFM[['R', 'F', 'M']].sum(axis = 1)
 ##EDA
-country = df_2.groupby(['Country']).agg({'CustomerID': 'count',
+country = df_1.groupby(['Country']).agg({'CustomerID': 'count',
                                'Quantity': 'mean'}).sort_values('CustomerID', ascending = False)
 
 ##Model
@@ -88,19 +83,19 @@ elif choice == 'Capstone Project':
     st.pyplot(fig)
 
     st.write('Country with number of order.')
-    st.dataframe(df_2.groupby(['Quantity', 'Country']).agg({'CustomerID': 'count'}).sort_values('Quantity', ascending = False)[:50])
+    st.dataframe(df_1.groupby(['Quantity', 'Country']).agg({'CustomerID': 'count'}).sort_values('Quantity', ascending = False)[:50])
     st.write('UK has number of orders which have > 1000 item. Assuming UK is wholesales market.')
-    st.dataframe(df_2[df_2['Quantity'] >=1000].groupby('Country').count())
+    st.dataframe(df_1[df_1['Quantity'] >=1000].groupby('Country').count())
 
     st.write('100 Best Sellers')
     fig_1 = plt.figure(figsize = (20, 8))
-    sns.barplot(data = df_2.sort_values('Quantity', ascending = False)[:100], x = 'Description', y = 'Quantity', ci = 0)
+    sns.barplot(data = df_1.sort_values('Quantity', ascending = False)[:100], x = 'Description', y = 'Quantity', ci = 0)
     plt.xticks(rotation = 'vertical')
     st.pyplot(fig_1)
 
     st.write('100 Worst Sellers')
     fig_1 = plt.figure(figsize = (20, 8))
-    sns.barplot(data = df_2.sort_values('Quantity', ascending = True)[:100], x = 'Description', y = 'Quantity', ci = 0)
+    sns.barplot(data = df_1.sort_values('Quantity', ascending = True)[:100], x = 'Description', y = 'Quantity', ci = 0)
     plt.xticks(rotation = 'vertical')
     st.pyplot(fig_1)
 elif choice == 'Customer Profile':
