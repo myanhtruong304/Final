@@ -91,13 +91,16 @@ elif choice == 'Basic Exploration':
     st.write('Country with number of order.')
     st.dataframe(df_1.groupby(['Quantity', 'Country']).agg({'CustomerID': 'count'}).sort_values('Quantity', ascending = False)[:50])
     st.write('UK has number of orders which have > 1000 item. Assuming UK is wholesales market.')
-    st.dataframe(df_1[df_1['Quantity'] >=1000].groupby('Country').count())
+    st.dataframe(df_1[df_1['Quantity'] >=1000].groupby('Country').agg({'InvoiceNo': 'count'}))
+    st.write('With 107 orders which has >1000 items per order, UK should be considered as a wholesales market.')
 
     st.write('100 Best Sellers')
     fig_1 = plt.figure(figsize = (20, 8))
     sns.barplot(data = df_1.sort_values('Quantity', ascending = False)[:100], x = 'Description', y = 'Quantity', ci = 0)
     plt.xticks(rotation = 'vertical')
     st.pyplot(fig_1)
+
+    st.write("Paper craft, Medium Ceramic Top is best sellers with total selled item is much higher than the others.")
 
     st.write('100 Worst Sellers')
     fig_1 = plt.figure(figsize = (20, 8))
