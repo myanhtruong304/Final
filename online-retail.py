@@ -56,7 +56,7 @@ RFM['KNN_cluster'] = kmeans_model.labels_
 
 
 st.title('Topic 2: Online Retail')
-menu = ['General', 'Capstone Project', 'Customer Profile']
+menu = ['General', 'Basic Exploration', 'Customer Segmentation']
 choice = st.sidebar.selectbox('Menu', menu)
 if choice == 'General':
     st.subheader('Team Members:')
@@ -64,12 +64,18 @@ if choice == 'General':
     st.write('Ngô Đình Ngọc Thúy')
 
     st.subheader('Abstract')
+    st.image('im.png')
     st.write('Customer segmentation is the activity of grouping your customers by several characteristics. It can be their personal information, spending behavior, demographic, etc. The purpose of doing customer segmentation is to understand each segment, so you can market and promote your brand effectively.')
     st.write('In this customer segmentation analysis, we use Online Retail customer segementation dataset. ')
 
-    st.subheader('Dataset')
-    st.dataframe(df_1)
-elif choice == 'Capstone Project':
+    st.subheader('About Dataset')
+    st.write('Number of records: ', len(df))
+    st.write('Features:', list(df.columns))
+    st.write('Number of orders:' ,len(df.InvoiceNo.unique()))
+    st.write('Number of Customer:', len(df.CustomerID.unique()))
+    st.write('Number of items:', len(df.StockCode.unique()))
+    st.write('Invoice Date from {} to {}'.format(min(df.InvoiceDate), max(df.InvoiceDate)))
+elif choice == 'Basic Exploration':
     st.header('Model Deployment')
     st.subheader('**RFM Method**')
     st.write("Recency, frequency, monetary value (RFM) is a marketing analysis tool used to identify a firm's best clients based on the nature of their spending habits.")
@@ -98,12 +104,17 @@ elif choice == 'Capstone Project':
     sns.barplot(data = df_1.sort_values('Quantity', ascending = True)[:100], x = 'Description', y = 'Quantity', ci = 0)
     plt.xticks(rotation = 'vertical')
     st.pyplot(fig_1)
-elif choice == 'Customer Profile':
+elif choice == 'Customer Segmentation':
     kmeans_model_2 = KMeans(n_clusters = 4)
     kmeans_model_2.fit(RFM[['R', 'F', 'M']])
     RFM['KNN_cluster_2'] = kmeans_model_2.labels_
     
-    st.write('Cluster with RFM indexes')
+    st.write('RFM factors illustrate these facts:')
+    st.write('- The more recent the purchase, the more responsive the customer is to promotions')
+    st.write('- The more frequently the customer buys, the more engaged and satisfied they are')
+    st.write('- Monetary value differentiates heavy spenders from low-value purchasers')
+    st.write("Clustering algorithm will help us to better understand customers, in terms of both static demographics and dynamic behaviors by conducting RFM analysis, let's see how we can score these customers by ranking them based on each RFM attribute.")
+    st.write("This pproach of scaling customers from 1-4 will result in many different RFM scores, ranging from 111(lowest) to 444(highest). Each RFM cell will differ in size and vary from one another, in terms of the customer's key habits, captured in the RFM score. We can't analyze all segments individually if each RFM cell is considered a segment.")
     fig_2 = plt.figure(figsize = (20, 5))
     sns.barplot(data=RFM.sort_values(by = 'KNN_cluster_2', ascending = False).reset_index(), x = 'KNN_cluster_2', y = 'RFM_Score', ci = 0)
     plt.xticks(rotation = 'vertical', fontsize = 16)
@@ -162,3 +173,9 @@ elif choice == 'Customer Profile':
     plt.axis('off')
 
     st.pyplot(fig_5)
+    st.image('im2.png')
+    st.subheader("Let's delve into few interesting segments!")
+    st.write('- At Rist: customer with high Receny, average Frequency, average Monetary:')
+    st.write('- Lost: customer with highest Recency, low Frequency, low Monetary.')
+    st.write('- Casual: customer with low Recency, low Frequency, average to low Monetary.')
+    st.write('- Potential: customer with lowest Recency, highest Frequency, highest Monetary.')
