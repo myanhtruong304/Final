@@ -178,7 +178,7 @@ elif choice == 'Customer Segmentation':
     st.pyplot(fig_5)
     st.image('im2.png')
     st.subheader("Let's delve into few interesting segments!")
-    st.write('- At Rist: customer with high Receny, average Frequency, average Monetary:')
+    st.write('- At Rist: customer with high Receny, average Frequency, average Monetary')
     st.write('- Lost: customer with highest Recency, low Frequency, low Monetary.')
     st.write('- Casual: customer with low Recency, low Frequency, average to low Monetary.')
     st.write('- Potential: customer with lowest Recency, highest Frequency, highest Monetary.')
